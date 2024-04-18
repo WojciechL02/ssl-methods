@@ -1,5 +1,6 @@
 dataset: "cifar10"
-approach: "dae"
+approach: "simclr"
 nepochs: 1
 batch_size: 16
 lr: 0.01
+temperature: 0.5

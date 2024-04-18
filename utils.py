@@ -5,6 +5,8 @@ import torch
 from torchvision import transforms
 from torchvision.datasets import CIFAR10, MNIST
 from approaches.dae import DAE
+from approaches.simclr import SimCLR
+
 
 def get_datasets(dataset: str):
     if dataset == "cifar10":
@@ -29,6 +31,8 @@ def get_datasets(dataset: str):
 def get_approach(approach, *args, **kwargs):
     if approach == "dae":
         return DAE(*args, **kwargs)
+    elif approach == "simclr":
+        return SimCLR(*args, **kwargs)
     return None
 
 

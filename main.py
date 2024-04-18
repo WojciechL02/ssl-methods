@@ -18,13 +18,13 @@ def main():
         exp_args = yaml.load(config_file, Loader=yaml.FullLoader)
 
     trainset, testset = get_datasets(exp_args["dataset"])
-    trainloader = DataLoader(trainset, batch_size=exp_args["batch_size"], shuffle=True, num_workers=3)
-    testloader = DataLoader(testset, batch_size=exp_args["batch_size"], shuffle=False, num_workers=3)
+    trainloader = DataLoader(trainset, batch_size=exp_args["batch_size"], shuffle=True, num_workers=3, drop_last=True)
+    testloader = DataLoader(testset, batch_size=exp_args["batch_size"], shuffle=False, num_workers=3, drop_last=True)
 
     # ================= PREPARE APPROACH =================
     curtime = datetime.now().strftime("%b%d_%H-%M-%S")
     exp_logger = SummaryWriter(log_dir=f"runs/{exp_args['approach']}/{curtime}")
-    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], logger=exp_logger)
+    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], temperature=exp_args["temperature"], batch_size=exp_args["batch_size"], logger=exp_logger)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     appr = get_approach(exp_args["approach"], device, **appr_kwargs)
