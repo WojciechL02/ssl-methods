@@ -41,9 +41,9 @@ class DAE(Approach):
         self.criterion = torch.nn.MSELoss(reduction='sum')
 
     def _forward(self, data):
-        data, _ = data[0].to(self.device), data[1].to(self.device)
+        target, _ = data[0].to(self.device), data[1].to(self.device)
         noise = torch.randn(data.size()) * self.noise_std + self.noise_mean
-        target = data + noise
+        data = target + noise
 
         features = self.model(data)
         reconstruction = self.model.decoder(features)
