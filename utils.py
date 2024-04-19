@@ -7,6 +7,7 @@ from torchvision.datasets import CIFAR10, MNIST
 from approaches.dae import DAE
 from approaches.mae import MAE
 from approaches.simclr import SimCLR
+from approaches.sae import SparseAE
 
 
 def get_datasets(dataset: str):
@@ -38,6 +39,8 @@ def get_approach(approach, *args, **kwargs):
         return SimCLR(*args, **kwargs)
     elif approach == "mae":
         return MAE(*args, **kwargs)
+    elif approach == "sae":
+        return SparseAE(*args, **kwargs)
 
     return None
 

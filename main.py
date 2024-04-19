@@ -24,7 +24,7 @@ def main():
     # ================= PREPARE APPROACH =================
     curtime = datetime.now().strftime("%b%d_%H-%M-%S")
     exp_logger = SummaryWriter(log_dir=f"runs/{exp_args['approach']}/{curtime}")
-    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], logger=exp_logger, patch_size=exp_args["patch_size"], masking_ratio=exp_args["masking_ratio"])
+    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], logger=exp_logger, sparsity_penalty=exp_args["sparsity_penalty"])
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     appr = get_approach(exp_args["approach"], device, **appr_kwargs)
@@ -40,7 +40,7 @@ def main():
 
     appr.model.eval()
     y = appr.model.encoder(x)
-    print(y.shape)
+    print(y[-1].shape)
 
 
 if __name__ == "__main__":

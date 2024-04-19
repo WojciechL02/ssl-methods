@@ -1,8 +1,6 @@
 dataset: "cifar10"
-approach: "mae"
+approach: "sae"
 nepochs: 1
 batch_size: 16
 lr: 0.01
-temperature: 0.5
-patch_size: 8
-masking_ratio: 0.25
+sparsity_penalty: 0.05
