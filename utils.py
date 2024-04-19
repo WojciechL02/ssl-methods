@@ -5,6 +5,7 @@ import torch
 from torchvision import transforms
 from torchvision.datasets import CIFAR10, MNIST
 from approaches.dae import DAE
+from approaches.mae import MAE
 from approaches.simclr import SimCLR
 
 
@@ -12,6 +13,7 @@ def get_datasets(dataset: str):
     if dataset == "cifar10":
         transform = transforms.Compose([
             transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         ])
         trainset = CIFAR10(root="../datasets/cifar10", train=True, transform=transform, download=False)
         testset = CIFAR10(root="../datasets/cifar10", train=False, transform=transform, download=False)
@@ -20,6 +22,7 @@ def get_datasets(dataset: str):
     elif dataset == "mnist":
         transform = transforms.Compose([
             transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
         ])
         trainset = MNIST(root="../datasets/mnist", train=True, transform=transform, download=False)
         testset = MNIST(root="../datasets/mnist", train=False, transform=transform, download=False)
@@ -33,6 +36,9 @@ def get_approach(approach, *args, **kwargs):
         return DAE(*args, **kwargs)
     elif approach == "simclr":
         return SimCLR(*args, **kwargs)
+    elif approach == "mae":
+        return MAE(*args, **kwargs)
+
     return None
 
 

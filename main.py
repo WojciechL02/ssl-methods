@@ -24,7 +24,7 @@ def main():
     # ================= PREPARE APPROACH =================
     curtime = datetime.now().strftime("%b%d_%H-%M-%S")
     exp_logger = SummaryWriter(log_dir=f"runs/{exp_args['approach']}/{curtime}")
-    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], temperature=exp_args["temperature"], batch_size=exp_args["batch_size"], logger=exp_logger)
+    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], logger=exp_logger, patch_size=exp_args["patch_size"], masking_ratio=exp_args["masking_ratio"])
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     appr = get_approach(exp_args["approach"], device, **appr_kwargs)
