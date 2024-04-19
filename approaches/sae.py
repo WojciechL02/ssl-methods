@@ -3,56 +3,34 @@ from .appr import Approach
 import torch
 
 
-class Encoder(nn.Module):
-    def __init__(self):
-        super(Encoder, self).__init__()
-        self.conv1 = nn.Conv2d(3, 256, 3, 2)
-        self.act1 = nn.LeakyReLU()
-        self.conv2 = nn.Conv2d(256, 128, 3, 1)
-        self.act2 = nn.LeakyReLU()
-        self.conv3 = nn.Conv2d(128, 64, 3, 1)
-        self.act3 = nn.LeakyReLU()
-        self.conv4 = nn.Conv2d(64, 32, 3, 1)
-        self.act4 = nn.LeakyReLU()
-
-    def forward(self, x):
-        act1 = self.act1(self.conv1(x))
-        act2 = self.act2(self.conv2(act1))
-        act3 = self.act3(self.conv3(act2))
-        act4 = self.act4(self.conv4(act3))
-        return act1, act2, act3, act4
-
-
-class Decoder(nn.Module):
-    def __init__(self):
-        super(Decoder, self).__init__()
-        self.convt1 = nn.ConvTranspose2d(32, 64, 3, 1)
-        self.act1 = nn.LeakyReLU()
-        self.convt2 = nn.ConvTranspose2d(64, 128, 3, 1)
-        self.act2 = nn.LeakyReLU()
-        self.convt3 = nn.ConvTranspose2d(128, 256, 3, 1)
-        self.act3 = nn.LeakyReLU()
-        self.convt4 = nn.ConvTranspose2d(256, 3, 3, 2, output_padding=1)
-        self.act4 = nn.Tanh()
-
-    def forward(self, x):
-        act1 = self.act1(self.convt1(x))
-        act2 = self.act2(self.convt2(act1))
-        act3 = self.act3(self.convt3(act2))
-        act4 = self.act4(self.convt4(act3))
-        return act1, act2, act3, act4
-
-
 class SAENet(nn.Module):
     def __init__(self):
         super(SAENet, self).__init__()
-        self.encoder = Encoder()
-        self.decoder = Decoder()
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 256, 3, 2),
+            nn.LeakyReLU(),
+            nn.Conv2d(256, 128, 3, 1),
+            nn.LeakyReLU(),
+            nn.Conv2d(128, 64, 3, 1),
+            nn.LeakyReLU(),
+            nn.Conv2d(64, 32, 3, 1),
+            nn.LeakyReLU(),
+        )
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(32, 64, 3, 1),
+            nn.LeakyReLU(),
+            nn.ConvTranspose2d(64, 128, 3, 1),
+            nn.LeakyReLU(),
+            nn.ConvTranspose2d(128, 256, 3, 1),
+            nn.LeakyReLU(),
+            nn.ConvTranspose2d(256, 3, 3, 2, output_padding=1),
+            nn.Tanh(),
+        )
 
     def forward(self, x):
-        e_a1, e_a2, e_a3, e_a4 = self.encoder(x)
-        d_a1, d_a2, d_a3, d_a4 = self.decoder(e_a4)
-        return [e_a1, e_a2, e_a3, e_a4, d_a1, d_a2, d_a3, d_a4]
+        features = self.encoder(x)
+        reconstruction = self.decoder(features)
+        return features, reconstruction
 
 
 class SparsityMSE(nn.Module):
@@ -63,7 +41,7 @@ class SparsityMSE(nn.Module):
 
     def forward(self, reconstruction, target, activations):
         mse = self._mse(reconstruction, target)
-        l1 = self.sparsity_penalty * sum(torch.norm(actv, 1) for actv in activations)
+        l1 = self.sparsity_penalty * torch.norm(activations, 1)
         return mse + l1
 
 
@@ -76,7 +54,6 @@ class SparseAE(Approach):
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)
 
-        activations = self.model(target)
-        reconstruction = activations[-1]
-        loss = self.criterion(reconstruction, target, activations)
+        features, reconstruction = self.model(target)
+        loss = self.criterion(reconstruction, target, features)
         return loss

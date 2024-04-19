@@ -40,7 +40,7 @@ def main():
 
     appr.model.eval()
     y = appr.model.encoder(x)
-    print(y[-1].shape)
+    print(y.shape)
 
 
 if __name__ == "__main__":
