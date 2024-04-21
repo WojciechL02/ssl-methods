@@ -5,7 +5,7 @@ from datetime import datetime
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
-from utils import get_datasets, get_approach
+from utils import get_datasets, get_approach, get_approach_keys
 
 
 def main():
@@ -24,7 +24,9 @@ def main():
     # ================= PREPARE APPROACH =================
     curtime = datetime.now().strftime("%b%d_%H-%M-%S")
     exp_logger = SummaryWriter(log_dir=f"runs/{exp_args['approach']}/{curtime}")
-    appr_kwargs = dict(nepochs=exp_args["nepochs"], lr=exp_args["lr"], logger=exp_logger, sparsity_penalty=exp_args["sparsity_penalty"])
+    appr_keys = get_approach_keys(exp_args["approach"])
+    appr_kwargs = {key: exp_args[key] for key in appr_keys if key in exp_args.keys()}
+    appr_kwargs["logger"] = exp_logger
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     appr = get_approach(exp_args["approach"], device, **appr_kwargs)
@@ -34,13 +36,6 @@ def main():
 
     exp_logger.flush()
     exp_logger.close()
-
-    # ================= TEST =================
-    x = testset[0][0]
-
-    appr.model.eval()
-    y = appr.model.encoder(x)
-    print(y.shape)
 
 
 if __name__ == "__main__":
