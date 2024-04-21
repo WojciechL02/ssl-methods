@@ -14,7 +14,7 @@ def get_datasets(dataset: str):
     if dataset == "cifar10":
         transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
+            # transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
         ])
         trainset = CIFAR10(root="../datasets/cifar10", train=True, transform=transform, download=False)
         testset = CIFAR10(root="../datasets/cifar10", train=False, transform=transform, download=False)
@@ -23,7 +23,7 @@ def get_datasets(dataset: str):
     elif dataset == "mnist":
         transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,)),
+            # transforms.Normalize((0.1307,), (0.3081,)),
         ])
         trainset = MNIST(root="../datasets/mnist", train=True, transform=transform, download=False)
         testset = MNIST(root="../datasets/mnist", train=False, transform=transform, download=False)
@@ -41,6 +41,19 @@ def get_approach(approach, *args, **kwargs):
         return MAE(*args, **kwargs)
     elif approach == "sae":
         return SparseAE(*args, **kwargs)
+
+    return None
+
+
+def get_approach_keys(approach_name):
+    if approach_name == "dae":
+        return ["nepochs", "lr", "logger", "noise_std", "noise_mean"]
+    elif approach_name == "mae":
+        return ["nepochs", "lr", "logger", "patch_size", "masking_ratio"]
+    elif approach_name == "sae":
+        return ["nepochs", "lr", "logger", "sparsity_penalty"]
+    elif approach_name == "simclr":
+        return ["nepochs", "lr", "logger", "batch_size", "temperature"]
 
     return None
 
