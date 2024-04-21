@@ -24,12 +24,13 @@ class MAENet(nn.Module):
             nn.ConvTranspose2d(128, 256, 3, 1),
             nn.LeakyReLU(),
             nn.ConvTranspose2d(256, 3, 3, 2, output_padding=1),
-            nn.Tanh(),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
         features = self.encoder(x)
-        return features
+        reconstruction = self.decoder(features)
+        return reconstruction
 
 
 class MAE(Approach):
@@ -39,6 +40,10 @@ class MAE(Approach):
         self.masking_ratio = masking_ratio
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = nn.MSELoss(reduction="sum")
+
+    def train(self, trn_loader, val_loader):
+        super().train(trn_loader, val_loader)
+        torch.save(self._best_state, f"checkpoints/mae_{self._time}.pt")
 
     def apply_masking(self, x):
         B, C, H, W = x.size()
@@ -62,7 +67,6 @@ class MAE(Approach):
         target, _ = data[0].to(self.device), data[1].to(self.device)
         data = self.apply_masking(target)
 
-        features = self.model(data)
-        reconstruction = self.model.decoder(features)
+        reconstruction = self.model(data)
         loss = self.criterion(reconstruction, target)
         return loss

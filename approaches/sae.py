@@ -24,7 +24,7 @@ class SAENet(nn.Module):
             nn.ConvTranspose2d(128, 256, 3, 1),
             nn.LeakyReLU(),
             nn.ConvTranspose2d(256, 3, 3, 2, output_padding=1),
-            nn.Tanh(),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -50,6 +50,10 @@ class SparseAE(Approach):
         super().__init__(device, SAENet(), nepochs, lr, logger)
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = SparsityMSE("sum", sparsity_penalty)
+
+    def train(self, trn_loader, val_loader):
+        super().train(trn_loader, val_loader)
+        torch.save(self._best_state, f"checkpoints/sae_{self._time}.pt")
 
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)

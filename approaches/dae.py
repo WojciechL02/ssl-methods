@@ -24,12 +24,13 @@ class DAENet(nn.Module):
             nn.ConvTranspose2d(128, 256, 3, 1),
             nn.LeakyReLU(),
             nn.ConvTranspose2d(256, 3, 3, 2, output_padding=1),
-            nn.Tanh(),
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
         features = self.encoder(x)
-        return features
+        reconstruction = self.decoder(features)
+        return reconstruction
 
 
 class DAE(Approach):
@@ -40,12 +41,15 @@ class DAE(Approach):
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = torch.nn.MSELoss(reduction='sum')
 
+    def train(self, trn_loader, val_loader):
+        super().train(trn_loader, val_loader)
+        torch.save(self._best_state, f"checkpoints/dae_{self._time}.pt")
+
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)
         noise = torch.randn(data.size()) * self.noise_std + self.noise_mean
         data = target + noise
 
-        features = self.model(data)
-        reconstruction = self.model.decoder(features)
+        reconstruction = self.model(data)
         loss = self.criterion(reconstruction, target)
         return loss

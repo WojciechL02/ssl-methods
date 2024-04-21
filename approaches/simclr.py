@@ -74,6 +74,10 @@ class SimCLR(Approach):
             transforms.RandomHorizontalFlip(p=0.4),
         ])
 
+    def train(self, trn_loader, val_loader):
+        super().train(trn_loader, val_loader)
+        torch.save(self._best_state, f"checkpoints/simclr_{self._time}.pt")
+
     def _forward(self, data):
         data, _ = data[0].to(self.device), data[1].to(self.device)
         x_i = self.transforms(data)

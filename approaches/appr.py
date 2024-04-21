@@ -14,18 +14,17 @@ class Approach:
         self.criterion = None
         self.scheduler = None
         self._time = datetime.now().strftime("%H:%M")
+        self._best_state = None
 
     def train(self, trn_loader, val_loader):
         best_loss = 999.
-        best_state = None
         for epoch in range(self.nepochs):
             t_loss = self.train_epoch(trn_loader)
             loss = self.eval(val_loader)
             print(f"Epoch {epoch} | Val loss: {loss:.4f} | Train loss: {t_loss:.4f}")
             if loss < best_loss:
                 best_loss = loss
-                best_state = copy.deepcopy(self.model.state_dict())
-        torch.save(best_state, f"checkpoints/dae_{self._time}.pt")
+                self._best_state = copy.deepcopy(self.model.state_dict())
 
     def train_epoch(self, trn_loader):
         self.model.train()
