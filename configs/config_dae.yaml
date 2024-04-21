@@ -1,0 +1,7 @@
+dataset: "cifar10"
+approach: "dae"
+nepochs: 100
+batch_size: 128
+lr: 0.001
+noise_mean: 0
+noise_std: 0.3

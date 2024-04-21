@@ -1,0 +1,6 @@
+dataset: "cifar10"
+approach: "simclr"
+nepochs: 100
+batch_size: 128
+lr: 0.001
+temperature: 0

@@ -1,0 +1,7 @@
+dataset: "cifar10"
+approach: "mae"
+nepochs: 100
+batch_size: 128
+lr: 0.001
+patch_size: 8
+masking_ratio: 0.4
