@@ -47,7 +47,7 @@ class DAE(Approach):
 
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)
-        noise = torch.randn(target.size()) * self.noise_std + self.noise_mean
+        noise = torch.randn(target.size(), device=self.device) * self.noise_std + self.noise_mean
         data = target + noise
 
         reconstruction = self.model(data)
