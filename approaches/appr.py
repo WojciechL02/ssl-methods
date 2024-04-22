@@ -21,7 +21,11 @@ class Approach:
         for epoch in range(self.nepochs):
             t_loss = self.train_epoch(trn_loader)
             loss = self.eval(val_loader)
+
+            self.logger.add_scalar(tag="Loss/train", scalar_value=t_loss, global_step=epoch)
+            self.logger.add_scalar(tag="Loss/val", scalar_value=loss, global_step=epoch)
             print(f"Epoch {epoch} | Val loss: {loss:.4f} | Train loss: {t_loss:.4f}")
+
             if loss < best_loss:
                 best_loss = loss
                 self._best_state = copy.deepcopy(self.model.state_dict())
@@ -42,8 +46,6 @@ class Approach:
                 self.scheduler.step()
 
         final_loss = total_loss / len(trn_loader)
-        tag = "Loss/train"
-        self.logger.add_scalar(tag=tag, scalar_value=final_loss)
         return final_loss
 
     def eval(self, val_loader):
@@ -55,8 +57,6 @@ class Approach:
                 total_loss += loss.item()
 
         final_loss = total_loss / len(val_loader)
-        tag = "Loss/val"
-        self.logger.add_scalar(tag=tag, scalar_value=final_loss)
         return final_loss
 
     def _forward(self, data):

@@ -52,7 +52,7 @@ class MAE(Approach):
         n_masked = int(self.masking_ratio * n_patches)
         masked_ids = torch.randperm(n=n_patches)[:n_masked]
 
-        mask = torch.ones((B, 1, H, W))
+        mask = torch.ones((B, 1, H, W)).to(x.device)
         for idx in masked_ids:
             idx = idx.item()
             patch_row = idx // n_patches_h
