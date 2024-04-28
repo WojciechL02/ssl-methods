@@ -36,14 +36,11 @@ class DAENet(nn.Module):
 class DAE(Approach):
     def __init__(self, device, nepochs, lr, logger, noise_std=0.3, noise_mean=0.):
         super().__init__(device, DAENet(), nepochs, lr, logger)
+        self._appr_name = "dae"
         self.noise_std = noise_std
         self.noise_mean = noise_mean
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = torch.nn.MSELoss(reduction='sum')
-
-    def train(self, trn_loader, val_loader):
-        super().train(trn_loader, val_loader)
-        torch.save(self._best_state, f"checkpoints/dae_{self._time}.pt")
 
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)
