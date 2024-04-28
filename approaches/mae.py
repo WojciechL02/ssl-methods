@@ -36,14 +36,11 @@ class MAENet(nn.Module):
 class MAE(Approach):
     def __init__(self, device, nepochs, lr, logger, patch_size, masking_ratio):
         super(MAE, self).__init__(device, MAENet(), nepochs, lr, logger)
+        self._appr_name = "mae"
         self.patch_size = patch_size
         self.masking_ratio = masking_ratio
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = nn.MSELoss(reduction="sum")
-
-    def train(self, trn_loader, val_loader):
-        super().train(trn_loader, val_loader)
-        torch.save(self._best_state, f"checkpoints/mae_{self._time}.pt")
 
     def apply_masking(self, x):
         B, C, H, W = x.size()

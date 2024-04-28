@@ -14,7 +14,6 @@ class Approach:
         self.criterion = None
         self.scheduler = None
         self._time = datetime.now().strftime("%H:%M")
-        self._best_state = None
 
     def train(self, trn_loader, val_loader):
         best_loss = 999.
@@ -27,8 +26,10 @@ class Approach:
             print(f"Epoch {epoch} | Val loss: {loss:.4f} | Train loss: {t_loss:.4f}")
 
             if loss < best_loss:
+                print("Saving model...")
+                print(self.model.state_dict())
                 best_loss = loss
-                self._best_state = copy.deepcopy(self.model.state_dict())
+                torch.save(self.model.state_dict(), f"checkpoints/{self._appr_name}_{self._time}.pt")
 
     def train_epoch(self, trn_loader):
         self.model.train()
@@ -44,6 +45,7 @@ class Approach:
 
             if self.scheduler is not None:
                 self.scheduler.step()
+            break
 
         final_loss = total_loss / len(trn_loader)
         return final_loss
@@ -55,6 +57,7 @@ class Approach:
             for batch_id, data in enumerate(val_loader):
                 loss = self._forward(data)
                 total_loss += loss.item()
+                break
 
         final_loss = total_loss / len(val_loader)
         return final_loss

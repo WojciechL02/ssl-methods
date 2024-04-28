@@ -67,16 +67,13 @@ class SimCLRNet(nn.Module):
 class SimCLR(Approach):
     def __init__(self, device, nepochs, lr, logger, batch_size, temperature):
         super().__init__(device, SimCLRNet(), nepochs, lr, logger)
+        self._appr_name = "simclr"
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.criterion = NT_Xent(batch_size, temperature)
 
         self.transforms = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.4),
         ])
-
-    def train(self, trn_loader, val_loader):
-        super().train(trn_loader, val_loader)
-        torch.save(self._best_state, f"checkpoints/simclr_{self._time}.pt")
 
     def _forward(self, data):
         data, _ = data[0].to(self.device), data[1].to(self.device)

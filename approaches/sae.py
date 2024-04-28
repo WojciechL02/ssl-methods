@@ -48,12 +48,9 @@ class SparsityMSE(nn.Module):
 class SparseAE(Approach):
     def __init__(self, device, nepochs, lr, logger, sparsity_penalty):
         super().__init__(device, SAENet(), nepochs, lr, logger)
+        self._appr_name = "sae"
         self.optimizer = torch.optim.Adam(self.model.parameters(), self.lr)
         self.criterion = SparsityMSE("sum", sparsity_penalty)
-
-    def train(self, trn_loader, val_loader):
-        super().train(trn_loader, val_loader)
-        torch.save(self._best_state, f"checkpoints/sae_{self._time}.pt")
 
     def _forward(self, data):
         target, _ = data[0].to(self.device), data[1].to(self.device)
